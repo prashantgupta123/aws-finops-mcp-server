@@ -1,0 +1,24 @@
+{
+  "name": "AWS FinOps MCP - SSH Tunnel",
+  "description": "Connect to MCP server on EC2 via SSH tunnel",
+  "mcpServers": {
+    "aws-finops-remote": {
+      "command": "curl",
+      "args": [
+        "-X", "POST",
+        "http://localhost:8000/mcp",
+        "-H", "Content-Type: application/json",
+        "-d", "@-"
+      ],
+      "env": {
+        "AWS_REGION": "us-east-1"
+      }
+    }
+  },
+  "setup": {
+    "step1": "Start SSH tunnel: ssh -i your-key.pem -L 8000:localhost:8000 ec2-user@your-ec2-ip -N",
+    "step2": "Keep the SSH tunnel running in a separate terminal",
+    "step3": "Configure your MCP client with this config",
+    "step4": "Test: curl http://localhost:8000/health"
+  }
+}

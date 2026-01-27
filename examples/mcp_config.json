@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "aws-finops": {
+      "command": "python",
+      "args": ["-m", "aws_finops_mcp"],
+      "env": {
+        "AWS_PROFILE": "your-profile-name",
+        "AWS_REGION": "us-east-1"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

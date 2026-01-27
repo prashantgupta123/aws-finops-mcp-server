@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  aws-finops-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aws-finops-mcp-server:latest
+    container_name: aws-finops-mcp-http
+    restart: unless-stopped
+    
+    # Expose HTTP port
+    ports:
+      # - "127.0.0.1:8000:8000"  # Bind to localhost only for security
+      # For remote access with proper security, use:
+      - "8000:8000"  # Then use SSH tunnel or reverse proxy
+    
+    # Environment variables
+    environment:
+      # MCP Server Configuration
+      - MCP_SERVER_MODE=http
+      - MCP_SERVER_HOST=0.0.0.0
+      - MCP_SERVER_PORT=8000
+      
+      # AWS Configuration
+      # Option 1: Use AWS profile (mount .aws directory)
+      - AWS_PROFILE=${AWS_PROFILE:-default}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      
+      # Option 2: Use access keys (not recommended for production)
+      # - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      # - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      # - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+      
+      # Option 3: Use IAM role (for EC2/ECS)
+      # No environment variables needed - automatically uses instance/task role
+      
+      # Logging
+      - PYTHONUNBUFFERED=1
+    
+    # Mount AWS credentials (for profile-based auth)
+    # Comment out if using IAM role
+    volumes:
+      - ~/.aws:/home/finops/.aws:ro
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Labels
+    labels:
+      - "com.aws.finops.mcp.version=0.2.0"
+      - "com.aws.finops.mcp.mode=http"
+

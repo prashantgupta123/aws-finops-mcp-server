@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  aws-finops-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aws-finops-mcp-server:latest
+    container_name: aws-finops-mcp
+    restart: unless-stopped
+    
+    # Environment variables for AWS credentials
+    environment:
+      # Option 1: Use AWS profile (mount .aws directory)
+      - AWS_PROFILE=${AWS_PROFILE:-default}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      
+      # Option 2: Use access keys (not recommended for production)
+      # - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      # - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      # - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+      
+      # Logging
+      - PYTHONUNBUFFERED=1
+    
+    # Mount AWS credentials (for profile-based auth)
+    volumes:
+      - ~/.aws:/home/finops/.aws:ro
+    
+    # Network mode for MCP communication
+    network_mode: host
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import aws_finops_mcp"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

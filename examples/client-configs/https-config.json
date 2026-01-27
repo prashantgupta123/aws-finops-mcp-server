@@ -1,0 +1,26 @@
+{
+  "name": "AWS FinOps MCP - HTTPS",
+  "description": "Connect to MCP server via HTTPS with authentication",
+  "mcpServers": {
+    "aws-finops-remote": {
+      "command": "curl",
+      "args": [
+        "-X", "POST",
+        "https://your-domain.com/mcp",
+        "-H", "Content-Type: application/json",
+        "-H", "Authorization: Basic YOUR_BASE64_CREDENTIALS",
+        "-d", "@-"
+      ],
+      "env": {
+        "AWS_REGION": "us-east-1"
+      }
+    }
+  },
+  "setup": {
+    "step1": "Setup Nginx with SSL on EC2",
+    "step2": "Configure basic authentication",
+    "step3": "Generate base64 credentials: echo -n 'username:password' | base64",
+    "step4": "Replace YOUR_BASE64_CREDENTIALS with the generated value",
+    "step5": "Test: curl -u username:password https://your-domain.com/health"
+  }
+}

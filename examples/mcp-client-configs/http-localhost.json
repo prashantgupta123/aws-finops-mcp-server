@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "aws-finops-http": {
+      "command": "node",
+      "args": [
+        "-e",
+        "const http = require('http'); const readline = require('readline'); const rl = readline.createInterface({input: process.stdin}); rl.on('line', (line) => { const req = http.request({hostname: 'localhost', port: 8000, path: '/mcp', method: 'POST', headers: {'Content-Type': 'application/json'}}, (res) => { let data = ''; res.on('data', (chunk) => data += chunk); res.on('end', () => console.log(data)); }); req.write(line); req.end(); });"
+      ],
+      "env": {
+        "MCP_SERVER_URL": "http://localhost:8000"
+      }
+    }
+  }
+}

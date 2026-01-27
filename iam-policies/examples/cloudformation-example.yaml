@@ -1,0 +1,239 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS FinOps MCP Server - IAM Resources'
+
+Parameters:
+  RoleName:
+    Type: String
+    Default: finops-mcp-role
+    Description: Name of the IAM role
+  
+  PolicyType:
+    Type: String
+    Default: full
+    AllowedValues:
+      - full
+      - minimal
+      - readonly
+      - cost-only
+    Description: Type of policy to use
+  
+  DeploymentType:
+    Type: String
+    Default: ec2
+    AllowedValues:
+      - ec2
+      - ecs
+      - lambda
+    Description: Deployment type
+
+Conditions:
+  IsEC2Deployment: !Equals [!Ref DeploymentType, ec2]
+  IsECSDeployment: !Equals [!Ref DeploymentType, ecs]
+  IsLambdaDeployment: !Equals [!Ref DeploymentType, lambda]
+  IsFullPolicy: !Equals [!Ref PolicyType, full]
+  IsMinimalPolicy: !Equals [!Ref PolicyType, minimal]
+  IsReadOnlyPolicy: !Equals [!Ref PolicyType, readonly]
+  IsCostOnlyPolicy: !Equals [!Ref PolicyType, cost-only]
+
+Resources:
+  # IAM Role
+  FinOpsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      Description: IAM role for AWS FinOps MCP Server
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - !If [IsEC2Deployment, ec2.amazonaws.com, !Ref AWS::NoValue]
+                - !If [IsECSDeployment, ecs-tasks.amazonaws.com, !Ref AWS::NoValue]
+                - !If [IsLambdaDeployment, lambda.amazonaws.com, !Ref AWS::NoValue]
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref FinOpsPolicy
+      Tags:
+        - Key: Application
+          Value: FinOpsMCP
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # IAM Policy - Full
+  FinOpsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub '${RoleName}-policy'
+      Description: !Sub 'Permissions for AWS FinOps MCP Server (${PolicyType})'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # EC2 Permissions
+          - Sid: EC2ReadPermissions
+            Effect: Allow
+            Action:
+              - ec2:DescribeInstances
+              - ec2:DescribeImages
+              - ec2:DescribeSnapshots
+              - ec2:DescribeVolumes
+              - ec2:DescribeAddresses
+              - ec2:DescribeSecurityGroups
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeRegions
+              - ec2:DescribeAvailabilityZones
+              - ec2:DescribeTags
+            Resource: '*'
+          
+          # RDS Permissions
+          - Sid: RDSReadPermissions
+            Effect: Allow
+            Action:
+              - rds:DescribeDBInstances
+              - rds:DescribeDBClusters
+              - rds:DescribeDBSnapshots
+              - rds:DescribeDBClusterSnapshots
+              - rds:ListTagsForResource
+            Resource: '*'
+          
+          # Lambda Permissions
+          - Sid: LambdaReadPermissions
+            Effect: Allow
+            Action:
+              - lambda:ListFunctions
+              - lambda:GetFunction
+              - lambda:GetFunctionConfiguration
+              - lambda:ListTags
+            Resource: '*'
+          
+          # ELB Permissions
+          - Sid: ELBReadPermissions
+            Effect: Allow
+            Action:
+              - elasticloadbalancing:DescribeLoadBalancers
+              - elasticloadbalancing:DescribeTargetGroups
+              - elasticloadbalancing:DescribeTargetHealth
+              - elasticloadbalancing:DescribeListeners
+              - elasticloadbalancing:DescribeRules
+              - elasticloadbalancing:DescribeTags
+            Resource: '*'
+          
+          # Auto Scaling Permissions
+          - Sid: AutoScalingReadPermissions
+            Effect: Allow
+            Action:
+              - autoscaling:DescribeAutoScalingGroups
+              - autoscaling:DescribeLaunchConfigurations
+              - autoscaling:DescribePolicies
+              - autoscaling:DescribeScalingActivities
+              - autoscaling:DescribeTags
+            Resource: '*'
+          
+          # CloudWatch Permissions
+          - Sid: CloudWatchReadPermissions
+            Effect: Allow
+            Action:
+              - cloudwatch:GetMetricStatistics
+              - cloudwatch:GetMetricData
+              - cloudwatch:ListMetrics
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:DescribeAlarmsForMetric
+            Resource: '*'
+          
+          # CloudWatch Logs Permissions
+          - Sid: CloudWatchLogsReadPermissions
+            Effect: Allow
+            Action:
+              - logs:DescribeLogGroups
+              - logs:DescribeLogStreams
+              - logs:DescribeMetricFilters
+              - logs:ListTagsLogGroup
+            Resource: '*'
+          
+          # Cost Explorer Permissions
+          - Sid: CostExplorerReadPermissions
+            Effect: Allow
+            Action:
+              - ce:GetCostAndUsage
+              - ce:GetCostForecast
+              - ce:GetDimensionValues
+              - ce:GetTags
+            Resource: '*'
+          
+          # Cost Optimization Hub Permissions
+          - Sid: CostOptimizationHubReadPermissions
+            Effect: Allow
+            Action:
+              - cost-optimization-hub:ListRecommendations
+              - cost-optimization-hub:GetRecommendation
+              - cost-optimization-hub:ListEnrollmentStatuses
+            Resource: '*'
+          
+          # STS Permissions
+          - Sid: STSPermissions
+            Effect: Allow
+            Action:
+              - sts:GetCallerIdentity
+              - sts:AssumeRole
+            Resource: '*'
+          
+          # Tag Permissions
+          - Sid: TagReadPermissions
+            Effect: Allow
+            Action:
+              - tag:GetResources
+              - tag:GetTagKeys
+              - tag:GetTagValues
+            Resource: '*'
+
+  # Instance Profile (for EC2)
+  FinOpsInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Condition: IsEC2Deployment
+    Properties:
+      InstanceProfileName: !Sub '${RoleName}-profile'
+      Roles:
+        - !Ref FinOpsRole
+
+Outputs:
+  RoleArn:
+    Description: ARN of the IAM role
+    Value: !GetAtt FinOpsRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-RoleArn'
+  
+  RoleName:
+    Description: Name of the IAM role
+    Value: !Ref FinOpsRole
+    Export:
+      Name: !Sub '${AWS::StackName}-RoleName'
+  
+  PolicyArn:
+    Description: ARN of the IAM policy
+    Value: !Ref FinOpsPolicy
+    Export:
+      Name: !Sub '${AWS::StackName}-PolicyArn'
+  
+  InstanceProfileArn:
+    Description: ARN of the instance profile (EC2 only)
+    Condition: IsEC2Deployment
+    Value: !GetAtt FinOpsInstanceProfile.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-InstanceProfileArn'
+  
+  UsageInstructions:
+    Description: Instructions for using the created resources
+    Value: !If
+      - IsEC2Deployment
+      - !Sub 'Attach to EC2: aws ec2 associate-iam-instance-profile --instance-id i-xxxxx --iam-instance-profile Name=${FinOpsInstanceProfile}'
+      - !If
+        - IsECSDeployment
+        - !Sub 'Use in ECS task definition: "taskRoleArn": "${FinOpsRole.Arn}"'
+        - !Sub 'Use in Lambda: aws lambda update-function-configuration --function-name finops-mcp --role ${FinOpsRole.Arn}'
+
+# Usage:
+# aws cloudformation create-stack \
+#   --stack-name finops-mcp-iam \
+#   --template-body file://cloudformation-example.yaml \
+#   --parameters ParameterKey=PolicyType,ParameterValue=full ParameterKey=DeploymentType,ParameterValue=ec2 \
+#   --capabilities CAPABILITY_NAMED_IAM

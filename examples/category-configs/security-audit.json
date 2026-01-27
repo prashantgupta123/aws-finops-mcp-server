@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "aws-finops-security": {
+      "command": "python",
+      "args": ["-m", "aws_finops_mcp"],
+      "env": {
+        "MCP_TOOL_CATEGORIES": "security,governance"
+      }
+    }
+  }
+}

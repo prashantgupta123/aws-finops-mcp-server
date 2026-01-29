@@ -244,6 +244,24 @@ All tools include:
 
 ## Installation
 
+### 🚀 NEW: Deploy to Amazon Bedrock AgentCore
+
+Deploy this MCP server to AWS Bedrock AgentCore for production-ready, scalable agent integration:
+
+```bash
+# One-command automated deployment
+./deploy-to-agentcore.sh
+```
+
+**Quick Links:**
+- 📖 [AgentCore Quick Start Guide](./AGENTCORE_QUICKSTART.md) - Get started in 5 minutes
+- 📚 [Complete Deployment Guide](./BEDROCK_AGENTCORE_DEPLOYMENT.md) - Step-by-step instructions
+- ⚖️ [Deployment Comparison](./AGENTCORE_COMPARISON.md) - Choose the right method
+
+**Two Deployment Methods:**
+1. **Gateway (Lambda)** - Quick setup, serverless, cost-effective
+2. **Runtime (Container)** - Production-ready, unlimited execution time
+
 ### Quick Start (Virtual Environment)
 
 ```bash
@@ -753,8 +771,11 @@ ssh -i key.pem -L 8000:localhost:8000 ec2-user@ec2-ip -N
 
 | Document | Description |
 |----------|-------------|
+| **[AGENTCORE_QUICKSTART.md](AGENTCORE_QUICKSTART.md)** | 🆕 Deploy to Amazon Bedrock AgentCore in 5 minutes |
+| **[BEDROCK_AGENTCORE_DEPLOYMENT.md](BEDROCK_AGENTCORE_DEPLOYMENT.md)** | 🆕 Complete AgentCore deployment guide |
+| **[AGENTCORE_COMPARISON.md](AGENTCORE_COMPARISON.md)** | 🆕 Compare Gateway vs Runtime deployment |
 | **[GETTING_STARTED.md](GETTING_STARTED.md)** | Complete setup guide with MCP configuration |
-| **[TOOL_CATEGORIES.md](TOOL_CATEGORIES.md)** | Category filtering guide (NEW!) |
+| **[TOOL_CATEGORIES.md](TOOL_CATEGORIES.md)** | Category filtering guide |
 | **[CATEGORY_QUICK_REFERENCE.md](CATEGORY_QUICK_REFERENCE.md)** | Quick reference for categories |
 | **[TOOLS_REFERENCE.md](TOOLS_REFERENCE.md)** | All 76 tools documentation |
 | **[DEPLOYMENT.md](DEPLOYMENT.md)** | Deployment options (EC2, ECS, Lambda, K8s) |

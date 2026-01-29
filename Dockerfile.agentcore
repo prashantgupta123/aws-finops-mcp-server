@@ -1,0 +1,52 @@
+# Dockerfile for Amazon Bedrock AgentCore Runtime
+# Requirements:
+# - Platform: linux/arm64 (required by AgentCore)
+# - Host: 0.0.0.0 (required)
+# - Port: 8000 (required)
+# - Endpoint: /mcp (required)
+
+FROM --platform=linux/arm64 python:3.13-slim-bookworm
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy project files
+COPY pyproject.toml ./
+COPY src/ ./src/
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -e .
+
+# Expose port 8000 (AgentCore Runtime requirement)
+EXPOSE 8000
+
+# Set environment variables for AgentCore Runtime
+ENV MCP_SERVER_MODE=http
+ENV MCP_SERVER_HOST=0.0.0.0
+ENV MCP_SERVER_PORT=8000
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Optional: Enable OAuth authentication
+# ENV MCP_REQUIRE_AUTH=true
+# ENV OAUTH_AUTH_SERVER=https://cognito-idp.us-east-1.amazonaws.com/YOUR_USER_POOL_ID
+# ENV OAUTH_TOKEN_ENDPOINT=https://cognito-idp.us-east-1.amazonaws.com/YOUR_USER_POOL_ID/oauth2/token
+
+# Health check (AgentCore Runtime compatible)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+# Labels for AgentCore Runtime
+LABEL com.amazonaws.bedrock.agentcore.protocol="MCP"
+LABEL com.amazonaws.bedrock.agentcore.protocol-version="2025-03-26"
+LABEL com.amazonaws.bedrock.agentcore.endpoint="/mcp"
+LABEL com.amazonaws.bedrock.agentcore.port="8000"
+
+# Run the MCP server
+CMD ["python", "-m", "aws_finops_mcp"]

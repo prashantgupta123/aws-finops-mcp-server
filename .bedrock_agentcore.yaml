@@ -1,0 +1,29 @@
+agents:
+  aws-finops-mcp-server:
+    name: aws-finops-mcp-server
+    description: AWS FinOps MCP Server for cost optimization and resource management
+    entrypoint: src/aws_finops_mcp/__main__.py
+    deployment_type: container
+    aws:
+      account: null
+      region: us-east-1
+      execution_role: auto
+      ecr: auto
+    runtime:
+      type: container
+      dockerfile: Dockerfile.agentcore
+      platform: linux/arm64
+      port: 8000
+      health_check:
+        path: /health
+        interval: 30
+        timeout: 10
+        retries: 3
+    environment:
+      MCP_SERVER_MODE: http
+      MCP_SERVER_HOST: 0.0.0.0
+      MCP_SERVER_PORT: "8000"
+      PYTHONUNBUFFERED: "1"
+      AWS_REGION: us-east-1
+
+default_agent: aws-finops-mcp-server

@@ -1,6 +1,45 @@
 # AWS FinOps MCP Server
 
+> **Production-Ready Deployment**: This MCP server is optimized for deployment on Amazon Bedrock AgentCore Runtime
+
 Model Context Protocol (MCP) server for AWS Financial Operations (FinOps) - providing comprehensive tools for cloud resource optimization, cost management, and performance monitoring.
+
+## 🚀 Quick Start - Deploy to AWS
+
+### Deploy to Amazon Bedrock AgentCore (Recommended)
+
+Deploy your MCP server to production in minutes:
+
+```bash
+# 1. Create ECR repository
+./create-ecr-repo.sh
+
+# 2. Update configuration
+sed -i 's/ecr: auto/ecr: aws-finops-mcp-server/' .bedrock_agentcore.yaml
+
+# 3. Deploy to AWS
+agentcore launch
+
+# 4. Test your deployment
+agentcore invoke '{"prompt": "find unused resources in us-east-1"}'
+```
+
+📖 **Complete Deployment Guides:**
+- **[AGENTCORE_DEPLOYMENT_FINAL.md](AGENTCORE_DEPLOYMENT_FINAL.md)** - Complete deployment guide with troubleshooting
+- **[AGENTCORE_QUICKSTART.md](AGENTCORE_QUICKSTART.md)** - Quick 5-minute deployment
+- **[AGENTCORE_RUNTIME_REVIEW.md](AGENTCORE_RUNTIME_REVIEW.md)** - Status review and next steps
+- **[QUICK_FIX_DEPLOYMENT.md](QUICK_FIX_DEPLOYMENT.md)** - Quick fixes for common issues
+- **[MANUAL_AGENTCORE_DEPLOY.md](MANUAL_AGENTCORE_DEPLOY.md)** - Manual Docker deployment
+
+### Local Development
+
+```bash
+# Install dependencies
+pip install -e .
+
+# Run locally
+python -m aws_finops_mcp
+```
 
 ## 🎯 Quick Overview
 
@@ -249,18 +288,20 @@ All tools include:
 Deploy this MCP server to AWS Bedrock AgentCore for production-ready, scalable agent integration:
 
 ```bash
-# One-command automated deployment
-./deploy-to-agentcore.sh
+# Quick deployment (recommended)
+pip install bedrock-agentcore-starter-toolkit
+agentcore launch
 ```
 
 **Quick Links:**
-- 📖 [AgentCore Quick Start Guide](./AGENTCORE_QUICKSTART.md) - Get started in 5 minutes
-- 📚 [Complete Deployment Guide](./BEDROCK_AGENTCORE_DEPLOYMENT.md) - Step-by-step instructions
+- ⚡ [Quick Fix Deployment](./QUICK_FIX_DEPLOYMENT.md) - Deploy in 5 commands
+- 📖 [Manual Deployment Guide](./MANUAL_AGENTCORE_DEPLOY.md) - Step-by-step manual process
+- 📚 [Complete Documentation](./BEDROCK_AGENTCORE_DEPLOYMENT.md) - Full deployment guide
 - ⚖️ [Deployment Comparison](./AGENTCORE_COMPARISON.md) - Choose the right method
 
 **Two Deployment Methods:**
 1. **Gateway (Lambda)** - Quick setup, serverless, cost-effective
-2. **Runtime (Container)** - Production-ready, unlimited execution time
+2. **Runtime (Container)** - Production-ready, unlimited execution time (use `agentcore launch`)
 
 ### Quick Start (Virtual Environment)
 

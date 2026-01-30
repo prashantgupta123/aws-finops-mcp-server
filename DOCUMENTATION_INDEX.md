@@ -68,6 +68,13 @@
     - Getting started
     - Installation instructions
 
+12. **[ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md)** ⭐ **NEW**
+    - Visual system architecture
+    - Deployment flow diagram
+    - Tool execution flow
+    - Security architecture
+    - Performance characteristics
+
 ## 🗂️ File Organization
 
 ### Configuration Files
@@ -118,6 +125,9 @@
 **Understand the project**
 → Read [README.md](README.md)
 
+**View architecture diagrams**
+→ See [ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md)
+
 ## 📊 Documentation Status
 
 | Document | Status | Purpose |
@@ -133,6 +143,7 @@
 | QUICK_REFERENCE.md | ✅ Current | Command reference |
 | CATEGORY_QUICK_REFERENCE.md | ✅ Current | Category reference |
 | README.md | ✅ Current | Main documentation |
+| ARCHITECTURE_DIAGRAMS.md | ✅ Current | Architecture diagrams |
 
 ## 🔄 Recently Removed
 

@@ -51,6 +51,8 @@ python -m aws_finops_mcp
 - **Performance Analysis** - Analyze and optimize application performance
 - **Ready-to-Use IAM Policies** - Get started in minutes
 
+📊 **[View Architecture Diagrams](ARCHITECTURE_DIAGRAMS.md)** - Visual system architecture and data flows
+
 ## 🆕 What's New
 
 ### Category-Based Tool Filtering
